@@ -7,23 +7,22 @@ services:
       - ./gogs:/data
     ports:
       - "3000:3000"
+      - "10022:22"
 
   drone-server:
     image: drone/drone:1
     ports:
-      - "8000:8000"
+      - "8080:80"
     volumes:
-      - ./drone:/var/lib/drone/
+      - ./drone:/data
     restart: always
     environment:
-      - DRONE_OPEN=true
-      - DRONE_HOST=http://drone-server:8000
-      - DRONE_GOGS_URL=http://gogs:3000
-      - DRONE_DEBUG=true
-      - DRONE_SECRET=ALQU2M0KdptXUdTPKcEw
-      - DRONE_GOGS=true
-      - DRONE_GOGS_SKIP_VERIFY=false
-      - DRONE_GOGS_PRIVATE_MODE=true
+      - DRONE_AGENTS_ENABLED=true
+      - DRONE_SERVER_HOST=drone-server
+      - DRONE_GOGS_SERVER=http://gogs:3000
+      - DRONE_TLS_AUTOCERT=false 
+      - DRONE_RPC_SECRET=00f5b2851bb047a27cf6378b53142e35529f469c
+      - DRONE_GOGS_SERVER_PROTO=http
 
   drone-agent:
     image: drone/agent:1
@@ -33,6 +32,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DRONE_SERVER=drone-server:9000
-      - DRONE_SECRET=ALQU2M0KdptXUdTPKcEw
+      - DRONE_SERVER=drone-server:8080
+      - DRONE_RPC_SECRET=00f5b2851bb047a27cf6378b53142e35529f469c
       - DRONE_DEBUG=true
